@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style type="text/css">
+			html, body{
+				width: 100%;
+				height: 100%;
+			}
+			body{
+				background: #eee;
+			}
+			.auth-form{
+				background: #fff;
+				display: block;
+				width: 268px;
+				margin: 0 auto;
+				padding: 16px;
+			}
+			.auth-form label{
+				display: block;
+				margin-top: 8px;
+				margin-bottom: 4px;
+			}
+			.form-submit-footer{
+				margin-top: 8px;
+			}
+
+			.form-submit-footer button{
+				padding: 8px 16px;
+			}
+
+			#user-list{
+				padding: 8px;
+			}
+			#user-list div{
+				padding: 8px;
+				border-bottom: solid 1px #f7f7f7;
+			}
+			#user-list div:last-child{
+				border-bottom: none;
+			}
+		</style>
+	</head>
+	<body>
+		<form method="POST" action="" id="auth-form" class="auth-form" onsubmit="return false;">
+			<label for="login">Login:</label>
+			<input id="login" autofocus type="text" name="login" />
+
+			<label for="password">Password:</label>
+			<input id="password" type="password" name="password" />
+
+			<div class="form-submit-footer">
+				<button name="action" value="login">Login</button>
+				<button name="action" value="register">Register</button>
+			</div>
+		</form>
+		<form method="POST" action="" id="list-form" class="auth-form">
+			<div class="form-submit-footer">
+				<button name="list">List</button>
+			</div>
+			<div id="user-list">
+
+			</div>
+		</form>
+		<script type="text/javascript">
+			(($in) => {
+				var register = (e) => {
+					e.preventDefault();
+					let loginElement = $in('login');
+					let passwordElement = $in('password');
+
+					(async () => {
+						const rawResponse = await fetch('/registration', {
+							method: 'POST',
+							headers: {
+								'Accept': 'application/json',
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({
+								login: loginElement.value,
+								password: passwordElement.value
+							})
+						});
+						const content = await rawResponse.json();
+						console.log(content);
+					})();
+					return false;
+				};
+				var login = (e) => {
+					e.preventDefault();
+					let loginElement = $in('login');
+					let passwordElement = $in('password');
+
+					(async () => {
+						const rawResponse = await fetch('/login', {
+							method: 'POST',
+							headers: {
+								'Accept': 'application/json',
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify({
+								login: loginElement.value,
+								password: passwordElement.value
+							})
+						});
+						const content = await rawResponse.json();
+						console.log(content);
+					})();
+					return false;
+				};
+				var list = (e) => {
+					e.preventDefault();
+
+
+					(async () => {
+						const rawResponse = await fetch('/user_list', {
+							method: 'GET',
+							headers: {
+								'Accept': 'application/json',
+								'Content-Type': 'application/json'
+							}
+						});
+						const content = await rawResponse.json();
+						let listElement = document.getElementById('user-list');
+						listElement.innerHTML = '';
+						for (key in content){
+							let login = content[key];
+							//console.log(key, content[key]);
+							let loginElement = document.createElement('div');
+							loginElement.textContent = login;
+							listElement.appendChild(loginElement);
+						}
+					})();
+					return false;
+				};
+				document.querySelector('#auth-form button[value=login]').addEventListener('click', login, true);
+				document.querySelector('#auth-form button[value=register]').addEventListener('click', register, true);
+				document.querySelector('#list-form').addEventListener('submit', list, true);
+			})(name => {
+				return document.querySelector(`#auth-form input[name=${name}]`);
+			});
+		</script>
+	</body>
+</html>
